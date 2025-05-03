@@ -1,45 +1,45 @@
 <template>
-  <div class="app">
-    <h1 class="title">Daftar Kegiatan</h1>
-    <form @submit.prevent="addTodo" class="todo-form">
-      <input v-model="newTodo" placeholder="Tambah kegiatan..." required />
-      <button type="submit">Tambah</button>
+  <div class="card">
+    <h1 class="title">Daftar Kegiatan <span class="icon">📋</span></h1>
+
+    <form @submit.prevent="submitTask" class="form">
+      <input
+        type="text"
+        v-model="task"
+        placeholder="Tambahkan tugas baru..."
+        class="input"
+        required
+      />
+      <button type="submit" class="btn">+ Tambah</button>
     </form>
 
-    <div class="todo-columns">
-      <div class="todo-section">
-  <h2>Belum Selesai</h2>
-  <ul class="todo-list">
-    <li v-if="incompleteTodos.length === 0" class="todo-item empty-message">
-      Tidak ada Kegiatan
-    </li>
-    <transition-group v-else name="fade" tag="ul" class="todo-list">
-      <li
-        v-for="(todo, index) in incompleteTodos"
-        :key="todo.text + index"
-        class="todo-item"
-      >
-        <span @click="toggleComplete(index)">{{ todo.text }}</span>
-        <button @click="removeTodo(index)">Hapus</button>
-      </li>
-    </transition-group>
-  </ul>
-</div>
-
-      <div class="todo-section">
-        <h2>DiSelesaikan</h2>
-        <transition-group name="complete" tag="ul" class="todo-list">
-          <li
-            v-for="(todo, index) in completeTodos"
-            :key="todo.text + index"
-            class="todo-item"
-          >
-            <span class="done" @click="toggleComplete(index)">{{ todo.text }}</span>
-            <button @click="removeTodo(index)">Hapus</button>
-          </li>
-        </transition-group>
-      </div>
+    <div class="filters">
+      <select v-model="filter">
+        <option value="all">Semua</option>
+        <option value="incomplete">Belum Selesai</option>
+      </select>
+      <span class="filter-icon">⚗️</span>
     </div>
+
+    <ul class="todo-list">
+      <li v-if="filteredTasks.length === 0" class="no-task">Belum ada tugas.</li>
+      <li
+        v-for="(t, index) in filteredTasks"
+        :key="index"
+        class="task-item"
+      >
+        <span
+          :class="{ done: t.done }"
+          @click="toggleTask(index)"
+          class="task-text"
+        >
+          {{ t.text }}
+        </span>
+        <button @click="removeTask(index)" class="delete-btn">✖</button>
+      </li>
+    </ul>
+
+    <p class="footer">Made by PacenZein</p>
   </div>
 </template>
 
@@ -47,172 +47,162 @@
 export default {
   data() {
     return {
-      newTodo: '',
-      todos: [],
+      task: '',
+      tasks: [],
+      filter: 'all'
     };
   },
   computed: {
-    incompleteTodos() {
-      return this.todos.filter((t) => !t.completed);
-    },
-    completeTodos() {
-      return this.todos.filter((t) => t.completed);
-    },
+    filteredTasks() {
+      if (this.filter === 'incomplete') {
+        return this.tasks.filter(task => !task.done);
+      }
+      return this.tasks;
+    }
   },
   methods: {
-    addTodo() {
-      this.todos.push({ text: this.newTodo, completed: false });
-      this.newTodo = '';
+    submitTask() {
+      if (this.task.trim() !== '') {
+        this.tasks.push({ text: this.task.trim(), done: false });
+        this.task = '';
+      }
     },
-    removeTodo(index) {
-      this.todos.splice(index, 1);
+    toggleTask(index) {
+      this.tasks[index].done = !this.tasks[index].done;
     },
-    toggleComplete(index) {
-      this.todos[index].completed = !this.todos[index].completed;
-    },
-  },
+    removeTask(index) {
+      this.tasks.splice(index, 1);
+    }
+  }
 };
 </script>
 
 <style scoped>
-.app {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Inter', sans-serif;
-  background-color: #111;
-  color: #f5f5f5;
-  border-radius: 20px;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+:root {
+  --green: #00ff99;
+  --dark: #121212;
+  --darker: #0d0d0d;
+  --gray: #1e1e1e;
+}
+
+body {
+  margin: 0;
+  background-color: var(--dark);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+  background: var(--darker);
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 30px;
+  border-radius: 24px;
+  box-shadow: 0 0 40px rgba(0, 255, 153, 0.2);
+  color: var(--green);
+  text-align: center;
 }
 
 .title {
-  text-align: center;
-  font-size: 2.5rem;
-  color: gold;
-  margin-bottom: 2rem;
-  font-weight: 600;
+  font-size: 24px;
+  margin-bottom: 20px;
+  font-weight: bold;
 }
 
-.todo-form {
+.icon {
+  font-size: 24px;
+  margin-left: 8px;
+}
+
+.form {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.todo-form input {
+.input {
   flex: 1;
-  padding: 0.75rem;
+  padding: 10px;
+  border-radius: 12px;
   border: none;
-  border-radius: 8px;
-  background-color: #222;
-  color: #fff;
-  font-size: 1rem;
-  outline: none;
+  background-color: #1f1f1f;
+  color: var(--green);
+  box-shadow: inset 0 0 5px rgba(0, 255, 153, 0.3);
 }
 
-.todo-form button {
-  padding: 0.75rem 1rem;
-  background-color: gold;
+.btn {
+  background-color: var(--green);
+  color: #000;
   border: none;
-  border-radius: 8px;
-  color: #111;
+  border-radius: 12px;
+  padding: 10px 20px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 255, 153, 0.3);
 }
 
-.todo-form button:hover {
-  background-color: #e0c200;
-}
-
-.todo-columns {
+.filters {
   display: flex;
-  justify-content: space-between;
-  gap: 2rem;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.todo-section {
-  flex: 1;
-  background-color: #1a1a1a;
-  padding: 1rem;
+.filters select {
+  background-color: #1f1f1f;
+  color: var(--green);
+  border: none;
   border-radius: 10px;
+  padding: 8px 16px;
 }
 
-.todo-section h2 {
-  text-align: center;
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-  color: #f5f5f5;
-  border-bottom: 1px solid #333;
-  padding-bottom: 0.5rem;
+.filter-icon {
+  font-size: 18px;
 }
 
 .todo-list {
   list-style: none;
   padding: 0;
-  margin: 0;
 }
 
-.todo-item {
-  background-color: #222;
-  padding: 0.75rem 1rem;
-  margin-bottom: 0.75rem;
-  border-radius: 8px;
+.task-item {
+  background: #1b1b1b;
+  margin: 10px 0;
+  padding: 10px 16px;
+  border-radius: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background-color 0.3s ease;
+  box-shadow: 0 0 6px rgba(0, 255, 153, 0.1);
 }
 
-.todo-item:hover {
-  background-color: #333;
-}
-
-.todo-item span {
+.task-text {
   cursor: pointer;
-  font-size: 1rem;
 }
 
-.todo-item span.done {
+.task-text.done {
   text-decoration: line-through;
-  color: #888;
-  font-style: italic;
+  color: #777;
+  opacity: 0.6;
 }
 
-.todo-item button {
-  background: none;
+.delete-btn {
+  background: transparent;
   border: none;
-  color: #f55;
-  font-weight: bold;
+  color: var(--green);
+  font-size: 18px;
   cursor: pointer;
-  transition: color 0.3s ease;
 }
 
-.todo-item button:hover {
-  color: #ff9999;
+.no-task {
+  font-style: italic;
+  color: #999;
+  margin-top: 20px;
 }
 
-/* Animasi Masuk & Keluar */
-.fade-enter-active,
-.complete-enter-active {
-  transition: all 0.4s ease;
-}
-.fade-leave-active,
-.complete-leave-active {
-  transition: all 0.3s ease;
-  opacity: 0;
-  transform: translateY(20px);
-}
-.fade-enter-from,
-.complete-enter-from {
-  opacity: 0;
-  transform: translateY(-20px);
-}
-.fade-leave-to,
-.complete-leave-to {
-  opacity: 0;
-  transform: scale(0.9);
+.footer {
+  margin-top: 30px;
+  font-size: 12px;
+  color: #777;
 }
 </style>
