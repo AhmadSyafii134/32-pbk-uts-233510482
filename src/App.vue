@@ -13,16 +13,19 @@
       <button type="submit" class="btn">+ Tambah</button>
     </form>
 
-    <div class="filters">
-      <select v-model="filter">
-        <option value="all">Semua</option>
-        <option value="incomplete">Belum Selesai</option>
-      </select>
-      <span class="filter-icon">⚗️</span>
+    <div class="filter-dropdown">
+      <button @click="toggleDropdown">
+        ⚗️ Filter
+      </button>
+      <ul v-if="dropdownOpen" class="dropdown-menu">
+        <li @click="setFilter('all')">Tampilkan Semua</li>
+        <li @click="setFilter('complete')">Tampilkan Selesai</li>
+        <li @click="setFilter('incomplete')">Tampilkan Belum Selesai</li>
+      </ul>
     </div>
 
     <ul class="todo-list">
-      <li v-if="filteredTasks.length === 0" class="no-task">Belum ada tugas.</li>
+      <li v-if="filteredTasks.length === 0" class="no-task">Belum ada tugas 📭.</li>
       <li
         v-for="(t, index) in filteredTasks"
         :key="index"
@@ -39,7 +42,7 @@
       </li>
     </ul>
 
-    <p class="footer">Made by PacenZein</p>
+    <p class="footer">Made by as3_ahmad134</p>
   </div>
 </template>
 
@@ -49,21 +52,24 @@ export default {
     return {
       task: '',
       tasks: [],
-      filter: 'all'
+      filter: 'all',
+      dropdownOpen: false,
     };
   },
   computed: {
     filteredTasks() {
-      if (this.filter === 'incomplete') {
-        return this.tasks.filter(task => !task.done);
+      if (this.filter === 'complete') {
+        return this.tasks.filter(t => t.done);
+      } else if (this.filter === 'incomplete') {
+        return this.tasks.filter(t => !t.done);
       }
       return this.tasks;
     }
   },
   methods: {
     submitTask() {
-      if (this.task.trim() !== '') {
-        this.tasks.push({ text: this.task.trim(), done: false });
+      if (this.task.trim()) {
+        this.tasks.push({ text: this.task, done: false });
         this.task = '';
       }
     },
@@ -72,10 +78,18 @@ export default {
     },
     removeTask(index) {
       this.tasks.splice(index, 1);
+    },
+    toggleDropdown() {
+      this.dropdownOpen = !this.dropdownOpen;
+    },
+    setFilter(value) {
+      this.filter = value;
+      this.dropdownOpen = false;
     }
   }
 };
 </script>
+
 
 <style scoped>
 :root {
@@ -131,7 +145,7 @@ body {
 
 .btn {
   background-color: var(--green);
-  color: #000;
+  color: #00ffa62d;
   border: none;
   border-radius: 12px;
   padding: 10px 20px;
@@ -150,7 +164,7 @@ body {
 
 .filters select {
   background-color: #1f1f1f;
-  color: var(--green);
+  color: #00ff00;
   border: none;
   border-radius: 10px;
   padding: 8px 16px;
@@ -206,3 +220,37 @@ body {
   color: #777;
 }
 </style>
+
+<style scoped>
+.filter-dropdown {
+  position: relative;
+  display: inline-block;
+  margin: 1em 0;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #1b1b1b;
+  border: 1px solid #00ffa62d;
+  list-style: none;
+  padding: 0.5em;
+  margin: 0;
+  z-index: 100;
+}
+
+.dropdown-menu li {
+  cursor: pointer;
+  padding: 0.5em;
+}
+
+.dropdown-menu li:hover {
+  background-color: #00ffa62d;
+}
+
+.done {
+  text-decoration: line-through;
+}
+</style>
+
