@@ -3,13 +3,7 @@
     <h1 class="title">Daftar Kegiatan <span class="icon">📋</span></h1>
 
     <form @submit.prevent="submitTask" class="form">
-      <input
-        type="text"
-        v-model="task"
-        placeholder="Tambahkan tugas baru..."
-        class="input"
-        required
-      />
+      <input type="text" v-model="task" placeholder="Tambahkan tugas baru..." class="input" required />
       <button type="submit" class="btn">+ Tambah</button>
     </form>
 
@@ -26,23 +20,17 @@
 
     <ul class="todo-list">
       <li v-if="filteredTasks.length === 0" class="no-task">Belum ada tugas 📭.</li>
-      <li
-        v-for="(t, index) in filteredTasks"
-        :key="index"
-        class="task-item"
-      >
-        <span
-          :class="{ done: t.done }"
-          @click="toggleTask(index)"
-          class="task-text"
-        >
+      <li v-for="(t, index) in filteredTasks" :key="index" class="task-item">
+        <span :class="{ done: t.done }" @click="toggleTask(index)" class="task-text">
           {{ t.text }}
         </span>
         <button @click="removeTask(index)" class="delete-btn">✖</button>
       </li>
     </ul>
 
-    <p class="footer">Made by as3_ahmad134</p>
+    <div class="footer-box">
+      <p class="footer">Made by as3_ahmad134</p>
+    </div>
   </div>
 </template>
 
@@ -214,8 +202,16 @@ body {
   margin-top: 20px;
 }
 
-.footer {
+.footer-box {
+  background-color: #1a1a1a;
+  padding: 12px;
+  border-radius: 12px;
   margin-top: 30px;
+  box-shadow: 0 0 10px rgba(0, 255, 153, 0.1);
+}
+
+.footer {
+  margin: 0;
   font-size: 12px;
   color: #777;
 }
@@ -253,4 +249,3 @@ body {
   text-decoration: line-through;
 }
 </style>
-
